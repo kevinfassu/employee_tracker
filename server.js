@@ -81,9 +81,9 @@ function viewEmployee() {
   console.log("Viewing employees\n");
 
   var query =
-    `SELECT e.id, e.first_name, e.last_name, r.title, d.name AS department, r.salary, CONCAT(m.first_name, ' ', m.last_name) AS manager
+    `SELECT e.id, e.first_name, e.last_name, r.title, d.department_name AS department, r.salary, CONCAT(m.first_name, ' ', m.last_name) AS manager
   FROM employee e
-  LEFT JOIN role r
+  LEFT JOIN employee_role r
 	ON e.role_id = r.id
   LEFT JOIN department d
   ON d.id = r.department_id
@@ -107,13 +107,13 @@ function viewEmployeeByDepartment() {
   console.log("Viewing employees by department\n");
 
   var query =
-    `SELECT d.id, d.name, r.salary AS budget
+    `SELECT d.id, d.department_name, r.salary AS budget
   FROM employee e
-  LEFT JOIN role r
+  LEFT JOIN employee_role r
 	ON e.role_id = r.id
   LEFT JOIN department d
   ON d.id = r.department_id
-  GROUP BY d.id, d.name`
+  GROUP BY d.id, d.department_name`
 
   connection.query(query, function (err, res) {
     if (err) throw err;
@@ -145,9 +145,9 @@ function promptDepartment(departmentChoices) {
       console.log("answer ", answer.departmentId);
 
       var query =
-        `SELECT e.id, e.first_name, e.last_name, r.title, d.name AS department 
+        `SELECT e.id, e.first_name, e.last_name, r.title, d.department_name AS department 
   FROM employee e
-  JOIN role r
+  JOIN employee_role r
 	ON e.role_id = r.id
   JOIN department d
   ON d.id = r.department_id
@@ -171,7 +171,7 @@ function addEmployee() {
 
   var query =
     `SELECT r.id, r.title, r.salary 
-      FROM role r`
+      FROM employee_role r`
 
   connection.query(query, function (err, res) {
     if (err) throw err;
@@ -291,9 +291,9 @@ function employeeArray() {
   console.log("Updating an employee");
 
   var query =
-    `SELECT e.id, e.first_name, e.last_name, r.title, d.name AS department, r.salary, CONCAT(m.first_name, ' ', m.last_name) AS manager
+    `SELECT e.id, e.first_name, e.last_name, r.title, d.department_name AS department, r.salary, CONCAT(m.first_name, ' ', m.last_name) AS manager
   FROM employee e
-  JOIN role r
+  JOIN employee_role r
 	ON e.role_id = r.id
   JOIN department d
   ON d.id = r.department_id
@@ -319,7 +319,7 @@ function roleArray(employeeChoices) {
 
   var query =
     `SELECT r.id, r.title, r.salary 
-  FROM role r`
+  FROM employee_role r`
   let roleChoices;
 
   connection.query(query, function (err, res) {
@@ -378,13 +378,13 @@ function promptEmployeeRole(employeeChoices, roleChoices) {
 function addRole() {
 
   var query =
-    `SELECT d.id, d.name, r.salary AS budget
+    `SELECT d.id, d.department_name, r.salary AS budget
     FROM employee e
-    JOIN role r
+    JOIN employee_role r
     ON e.role_id = r.id
     JOIN department d
     ON d.id = r.department_id
-    GROUP BY d.id, d.name`
+    GROUP BY d.id, d.department_name`
 
   connection.query(query, function (err, res) {
     if (err) throw err;
@@ -424,7 +424,7 @@ function promptAddRole(departmentChoices) {
     ])
     .then(function (answer) {
 
-      var query = `INSERT INTO role SET ?`
+      var query = `INSERT INTO employee_role SET ?`
 
       connection.query(query, {
         title: answer.title,
